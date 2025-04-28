@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Analytics Project 2: Option Pricing Analysis</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--light-bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        nav ul li {
+            margin: 0 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 4rem 0;
+        }
+
+        section h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* Project Overview */
+        .project-overview {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Strategy Section */
+        .strategy-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .strategy-text {
+            padding: 2rem;
+        }
+
+        .strategy-image {
+            text-align: center;
+        }
+
+        .strategy-image img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Code Snippets */
+        .code-section {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 2rem;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        pre {
+            margin: 0;
+        }
+
+        /* Mathematical Formulas */
+        .formula-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+        }
+
+        .formula {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .result-card {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Interactive Elements */
+        .interactive-section {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+        }
+
+        .slider-container {
+            margin: 2rem 0;
+        }
+
+        .slider {
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-bg);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .social-links {
+            margin: 1rem 0;
+        }
+
+        .social-links a {
+            color: white;
+            margin: 0 1rem;
+            font-size: 1.5rem;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .strategy-section {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav ul li {
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>Financial Analytics Project 2</h1>
+            <p>Option Pricing and Derivative Strategy Design</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#strategy">Strategy</a></li>
+                <li><a href="#implementation">Implementation</a></li>
+                <li><a href="#results">Results</a></li>
+                <li><a href="#interactive">Interactive</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="overview">
+            <h2>Project Overview</h2>
+            <div class="project-overview">
+                <p>This project implements a Bull Call Spread options trading strategy analysis for Reliance Industries
+                    using real-time market data from NSE India. The analysis includes option pricing using Black-Scholes
+                    model, Monte Carlo simulation, and comprehensive profit/loss analysis.</p>
+            </div>
+        </section>
+
+        <section id="strategy">
+            <h2>Bull Call Spread Strategy</h2>
+            <div class="strategy-section">
+                <div class="strategy-text">
+                    <h3>Strategy Components</h3>
+                    <ul>
+                        <li>Buy one call option at ATM strike price</li>
+                        <li>Sell one call option at OTM strike price</li>
+                        <li>Limited risk and reward profile</li>
+                        <li>Suitable for moderately bullish markets</li>
+                    </ul>
+                </div>
+                <div class="strategy-image">
+                    <img src="bull_call_spread_payoff.png" alt="Bull Call Spread Payoff Diagram">
+                </div>
+            </div>
+        </section>
+
+        <section id="implementation">
+            <h2>Implementation</h2>
+            <div class="code-section">
+                <h3>Data Processing</h3>
+                <pre><code>
+def read_nse_data():
+    try:
+        # Read call options data
+        ce_data = pd.read_csv("OPTSTK_RELIANCE_CE_28-Jan-2025_TO_28-Apr-2025.csv")
+        
+        # Read put options data
+        pe_data = pd.read_csv("OPTSTK_RELIANCE_PE_28-Jan-2025_TO_28-Apr-2025.csv")
+        
+        # Clean column names
+        ce_data.columns = ce_data.columns.str.strip()
+        pe_data.columns = pe_data.columns.str.strip()
+        
+        # Get spot price and strike prices
+        spot_price = float(ce_data['Underlying Value'].iloc[0])
+        atm_strike = float(ce_data.loc[ce_data['Strike_Diff'].idxmin(), 'Strike Price'])
+        
+        return spot_price, atm_strike, otm_strike, premiums
+    except Exception as e:
+        print(f"Error reading data: {str(e)}")
+        raise
+                </code></pre>
+            </div>
+
+            <div class="formula-section">
+                <h3>Mathematical Models</h3>
+                <div class="formula">
+                    <p>Black-Scholes Call Price:</p>
+                    <p>C = S·N(d₁) - K·e^(-rT)·N(d₂)</p>
+                    <p>where d₁ = [ln(S/K) + (r + σ²/2)T] / (σ√T)</p>
+                    <p>and d₂ = d₁ - σ√T</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="results">
+            <h2>Results</h2>
+            <div class="results-section">
+                <div class="result-card">
+                    <h3>Market Data</h3>
+                    <p>Spot Price: ₹1300.40</p>
+                    <p>ATM Strike: ₹1300.00</p>
+                    <p>OTM Strike: ₹1310.00</p>
+                </div>
+                <div class="result-card">
+                    <h3>Strategy Analysis</h3>
+                    <p>Break-even: ₹1305.60</p>
+                    <p>Max Profit: ₹4.40</p>
+                    <p>Max Loss: ₹5.60</p>
+                </div>
+                <div class="result-card">
+                    <h3>Model Validation</h3>
+                    <p>Black-Scholes Price: ₹35.16</p>
+                    <p>Monte Carlo Price: ₹35.14</p>
+                    <p>Put-Call Parity: Valid</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="interactive">
+            <h2>Interactive Analysis</h2>
+            <div class="interactive-section">
+                <h3>Option Price Sensitivity</h3>
+                <div class="slider-container">
+                    <label for="volatility">Volatility (%):</label>
+                    <input type="range" id="volatility" class="slider" min="10" max="30" value="19.29" step="0.01">
+                    <p>Current Value: <span id="volatility-value">19.29</span>%</p>
+                </div>
+                <div class="slider-container">
+                    <label for="time">Time to Expiry (days):</label>
+                    <input type="range" id="time" class="slider" min="1" max="90" value="34" step="1">
+                    <p>Current Value: <span id="time-value">34</span> days</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Financial Analytics Project 2 - Option Pricing Analysis</p>
+            <div class="social-links">
+                <a href="https://github.com/kyupralis24/Financial-Analytics-Project-2" target="_blank">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+            <p>© 2025 All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        // Interactive sliders
+        const volatilitySlider = document.getElementById('volatility');
+        const timeSlider = document.getElementById('time');
+        const volatilityValue = document.getElementById('volatility-value');
+        const timeValue = document.getElementById('time-value');
+
+        volatilitySlider.addEventListener('input', function () {
+            volatilityValue.textContent = this.value;
+        });
+
+        timeSlider.addEventListener('input', function () {
+            timeValue.textContent = this.value;
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
