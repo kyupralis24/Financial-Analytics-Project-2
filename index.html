@@ -138,10 +138,17 @@
             padding: 2rem;
             border-radius: 10px;
             overflow-x: auto;
+            margin-bottom: 2rem;
         }
 
         pre {
             margin: 0;
+        }
+
+        .code-section h4 {
+            color: #61dafb;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         /* Mathematical Formulas */
@@ -158,6 +165,21 @@
             font-size: 1.2rem;
             text-align: center;
             margin: 1rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .formula h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .formula ul {
+            margin-left: 2rem;
+            margin-top: 1rem;
+        }
+
+        .formula li {
+            margin-bottom: 0.5rem;
         }
 
         /* Results Section */
@@ -231,6 +253,68 @@
                 margin: 0.5rem 0;
             }
         }
+
+        /* Abstract Section */
+        .abstract-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        /* Results Table */
+        .results-table {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+        }
+
+        .results-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .results-table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .results-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Team Members */
+        .team-members {
+            margin-top: 2rem;
+        }
+
+        .team-members ul {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            list-style: none;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .team-members li {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 
@@ -242,9 +326,11 @@
             <div class="team-members">
                 <h3>Team Members</h3>
                 <ul>
+                    <li>Rachit Korrapati</li>
+                    <li>Ankit Kumar</li>
+                    <li>Mishka Singh</li>
+                    <li>Sarthak Rathi</li>
                     <li>Viom Kapur</li>
-                    <li>Kyupralis</li>
-                    <li>Other Team Member</li>
                 </ul>
             </div>
         </div>
@@ -263,6 +349,19 @@
     </nav>
 
     <main class="container">
+        <section id="abstract">
+            <h2>Abstract</h2>
+            <div class="abstract-content">
+                <p>This report analyzes a Bull Call Spread strategy for Reliance Industries (RELIANCE.NS) using real
+                    option chain data from NSE India (April 25, 2025, expiry May 29, 2025). We derive Black-Scholes and
+                    Monte Carlo pricing models from first principles, validate Put-Call Parity, and assess profitability
+                    with a payoff diagram and profit table. The strategy, buying a call at 1300 and selling at 1310,
+                    yields a break-even of 1305.60, maximum profit of 4.40, and maximum loss of 5.60. The analysis
+                    combines rigorous financial mathematics with practical insights, confirming the strategy's
+                    suitability for moderately bullish markets.</p>
+            </div>
+        </section>
+
         <section id="overview">
             <h2>Project Overview</h2>
             <div class="project-overview">
@@ -302,34 +401,70 @@
 
         <section id="implementation">
             <h2>Implementation</h2>
+
             <div class="code-section">
-                <h3>Data Processing</h3>
+                <h3>Option Pricing Models</h3>
+                <h4>Black-Scholes Model Implementation</h4>
                 <pre><code>
-def read_nse_data():
-    try:
-        # Read call options data
-        ce_data = pd.read_csv("OPTSTK_RELIANCE_CE_28-Jan-2025_TO_28-Apr-2025.csv")
-        
-        # Read put options data
-        pe_data = pd.read_csv("OPTSTK_RELIANCE_PE_28-Jan-2025_TO_28-Apr-2025.csv")
-        
-        # Clean column names
-        ce_data.columns = ce_data.columns.str.strip()
-        pe_data.columns = pe_data.columns.str.strip()
-        
-        # Get spot price and strike prices
-        spot_price = float(ce_data['Underlying Value'].iloc[0])
-        atm_strike = float(ce_data.loc[ce_data['Strike_Diff'].idxmin(), 'Strike Price'])
-        
-        return spot_price, atm_strike, otm_strike, premiums
-    except Exception as e:
-        print(f"Error reading data: {str(e)}")
-        raise
+def black_scholes_call_put(S, K, T, r, sigma):
+    """
+    Calculate Black-Scholes call and put option prices
+    
+    Parameters:
+    S: Current stock price
+    K: Strike price
+    T: Time to maturity (in years)
+    r: Risk-free interest rate
+    sigma: Volatility
+    
+    Returns:
+    call_price, put_price: Option prices
+    """
+    d1 = (np.log(S/K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+    d2 = d1 - sigma * np.sqrt(T)
+    
+    call_price = S * norm.cdf(d1) - K * np.exp(-r * T) * norm.cdf(d2)
+    put_price = K * np.exp(-r * T) * norm.cdf(-d2) - S * norm.cdf(-d1)
+    
+    return call_price, put_price
+                </code></pre>
+
+                <h4>Monte Carlo Simulation Implementation</h4>
+                <pre><code>
+def monte_carlo_option_price(S, K, T, r, sigma, n_simulations=10000):
+    """
+    Calculate option price using Monte Carlo simulation
+    
+    Parameters:
+    S: Current stock price
+    K: Strike price
+    T: Time to maturity (in years)
+    r: Risk-free interest rate
+    sigma: Volatility
+    n_simulations: Number of simulation paths
+    
+    Returns:
+    call_price: Estimated call option price
+    """
+    np.random.seed(42)  # For reproducibility
+    Z = np.random.normal(0, 1, n_simulations)
+    
+    # Simulate stock price at maturity
+    S_T = S * np.exp((r - 0.5 * sigma**2) * T + sigma * np.sqrt(T) * Z)
+    
+    # Calculate payoffs
+    payoffs = np.maximum(S_T - K, 0)
+    
+    # Discount and average payoffs
+    call_price = np.exp(-r * T) * np.mean(payoffs)
+    
+    return call_price
                 </code></pre>
             </div>
 
             <div class="formula-section">
                 <h3>Mathematical Models</h3>
+
                 <div class="formula">
                     <h4>Black-Scholes Model</h4>
                     <p>The Black-Scholes model is a mathematical model for pricing European-style options. The formula
@@ -355,6 +490,59 @@ def read_nse_data():
                     <p>S_T = S₀ * exp((r - σ²/2)T + σ√T * Z)</p>
                     <p>where Z is a standard normal random variable.</p>
                 </div>
+
+                <div class="formula">
+                    <h4>Put-Call Parity</h4>
+                    <p>The put-call parity relationship must hold for European options:</p>
+                    <p>C + K·e^(-rT) = P + S</p>
+                    <p>where:</p>
+                    <ul>
+                        <li>C = Call option price</li>
+                        <li>P = Put option price</li>
+                        <li>K = Strike price</li>
+                        <li>S = Current stock price</li>
+                        <li>r = Risk-free rate</li>
+                        <li>T = Time to maturity</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="results-table">
+                <h3>Strategy Analysis Results</h3>
+                <table>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Lower Strike (Buy)</td>
+                        <td>₹1300.00</td>
+                    </tr>
+                    <tr>
+                        <td>Upper Strike (Sell)</td>
+                        <td>₹1310.00</td>
+                    </tr>
+                    <tr>
+                        <td>Break-even Point</td>
+                        <td>₹1305.60</td>
+                    </tr>
+                    <tr>
+                        <td>Maximum Profit</td>
+                        <td>₹4.40</td>
+                    </tr>
+                    <tr>
+                        <td>Maximum Loss</td>
+                        <td>₹5.60</td>
+                    </tr>
+                    <tr>
+                        <td>Black-Scholes Call Price</td>
+                        <td>₹35.16</td>
+                    </tr>
+                    <tr>
+                        <td>Monte Carlo Call Price</td>
+                        <td>₹35.14</td>
+                    </tr>
+                </table>
             </div>
         </section>
 
