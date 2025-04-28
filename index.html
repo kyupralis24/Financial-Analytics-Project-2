@@ -239,6 +239,14 @@
         <div class="container">
             <h1>Financial Analytics Project 2</h1>
             <p>Option Pricing and Derivative Strategy Design</p>
+            <div class="team-members">
+                <h3>Team Members</h3>
+                <ul>
+                    <li>Viom Kapur</li>
+                    <li>Kyupralis</li>
+                    <li>Other Team Member</li>
+                </ul>
+            </div>
         </div>
     </header>
 
@@ -261,6 +269,16 @@
                 <p>This project implements a Bull Call Spread options trading strategy analysis for Reliance Industries
                     using real-time market data from NSE India. The analysis includes option pricing using Black-Scholes
                     model, Monte Carlo simulation, and comprehensive profit/loss analysis.</p>
+
+                <h3>Key Components</h3>
+                <ul>
+                    <li>Real-time market data analysis from NSE India</li>
+                    <li>Black-Scholes option pricing model implementation</li>
+                    <li>Monte Carlo simulation for option pricing</li>
+                    <li>Put-Call parity validation</li>
+                    <li>Profit/Loss analysis and break-even calculations</li>
+                    <li>Visual payoff diagram generation</li>
+                </ul>
             </div>
         </section>
 
@@ -313,10 +331,29 @@ def read_nse_data():
             <div class="formula-section">
                 <h3>Mathematical Models</h3>
                 <div class="formula">
-                    <p>Black-Scholes Call Price:</p>
+                    <h4>Black-Scholes Model</h4>
+                    <p>The Black-Scholes model is a mathematical model for pricing European-style options. The formula
+                        for a call option is:</p>
                     <p>C = S·N(d₁) - K·e^(-rT)·N(d₂)</p>
-                    <p>where d₁ = [ln(S/K) + (r + σ²/2)T] / (σ√T)</p>
-                    <p>and d₂ = d₁ - σ√T</p>
+                    <p>where:</p>
+                    <ul>
+                        <li>d₁ = [ln(S/K) + (r + σ²/2)T] / (σ√T)</li>
+                        <li>d₂ = d₁ - σ√T</li>
+                        <li>S = Current stock price</li>
+                        <li>K = Strike price</li>
+                        <li>r = Risk-free interest rate</li>
+                        <li>T = Time to maturity</li>
+                        <li>σ = Volatility of the stock</li>
+                        <li>N(·) = Cumulative distribution function of the standard normal distribution</li>
+                    </ul>
+                </div>
+
+                <div class="formula">
+                    <h4>Monte Carlo Simulation</h4>
+                    <p>We use Monte Carlo simulation to estimate option prices by simulating multiple possible paths of
+                        the underlying asset price:</p>
+                    <p>S_T = S₀ * exp((r - σ²/2)T + σ√T * Z)</p>
+                    <p>where Z is a standard normal random variable.</p>
                 </div>
             </div>
         </section>
@@ -348,16 +385,43 @@ def read_nse_data():
         <section id="interactive">
             <h2>Interactive Analysis</h2>
             <div class="interactive-section">
-                <h3>Option Price Sensitivity</h3>
+                <h3>Option Price Sensitivity Analysis</h3>
+                <p>Use the sliders below to see how different parameters affect the option price:</p>
+
                 <div class="slider-container">
+                    <h4>Volatility Impact</h4>
+                    <p>Volatility (σ) measures the degree of variation of the stock price. Higher volatility generally
+                        leads to higher option prices.</p>
                     <label for="volatility">Volatility (%):</label>
                     <input type="range" id="volatility" class="slider" min="10" max="30" value="19.29" step="0.01">
                     <p>Current Value: <span id="volatility-value">19.29</span>%</p>
+                    <div id="volatility-impact">
+                        <p>Impact on Option Price: <span id="volatility-price">₹35.16</span></p>
+                    </div>
                 </div>
+
                 <div class="slider-container">
+                    <h4>Time to Expiry Impact</h4>
+                    <p>Time to expiry (T) affects the option price through the time value component. More time means
+                        higher option prices.</p>
                     <label for="time">Time to Expiry (days):</label>
                     <input type="range" id="time" class="slider" min="1" max="90" value="34" step="1">
                     <p>Current Value: <span id="time-value">34</span> days</p>
+                    <div id="time-impact">
+                        <p>Impact on Option Price: <span id="time-price">₹35.16</span></p>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <h4>Risk-Free Rate Impact</h4>
+                    <p>The risk-free rate (r) affects the present value of the strike price. Higher rates generally
+                        increase call option prices.</p>
+                    <label for="rate">Risk-Free Rate (%):</label>
+                    <input type="range" id="rate" class="slider" min="1" max="10" value="7.15" step="0.01">
+                    <p>Current Value: <span id="rate-value">7.15</span>%</p>
+                    <div id="rate-impact">
+                        <p>Impact on Option Price: <span id="rate-price">₹35.16</span></p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -376,19 +440,72 @@ def read_nse_data():
     </footer>
 
     <script>
-        // Interactive sliders
+        // Interactive sliders with price calculations
         const volatilitySlider = document.getElementById('volatility');
         const timeSlider = document.getElementById('time');
+        const rateSlider = document.getElementById('rate');
         const volatilityValue = document.getElementById('volatility-value');
         const timeValue = document.getElementById('time-value');
+        const rateValue = document.getElementById('rate-value');
+        const volatilityPrice = document.getElementById('volatility-price');
+        const timePrice = document.getElementById('time-price');
+        const ratePrice = document.getElementById('rate-price');
+
+        // Black-Scholes calculation function
+        function calculateOptionPrice(S, K, T, r, sigma) {
+            const d1 = (Math.log(S / K) + (r + sigma * sigma / 2) * T) / (sigma * Math.sqrt(T));
+            const d2 = d1 - sigma * Math.sqrt(T);
+            return S * normCDF(d1) - K * Math.exp(-r * T) * normCDF(d2);
+        }
+
+        // Standard normal CDF approximation
+        function normCDF(x) {
+            const a1 = 0.254829592;
+            const a2 = -0.284496736;
+            const a3 = 1.421413741;
+            const a4 = -1.453152027;
+            const a5 = 1.061405429;
+            const p = 0.3275911;
+
+            const sign = x < 0 ? -1 : 1;
+            x = Math.abs(x) / Math.sqrt(2.0);
+
+            const t = 1.0 / (1.0 + p * x);
+            const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+
+            return 0.5 * (1.0 + sign * y);
+        }
+
+        function updatePrices() {
+            const S = 1300.40; // Current stock price
+            const K = 1300.00; // Strike price
+            const T = timeSlider.value / 365; // Convert days to years
+            const r = rateSlider.value / 100; // Convert percentage to decimal
+            const sigma = volatilitySlider.value / 100; // Convert percentage to decimal
+
+            const price = calculateOptionPrice(S, K, T, r, sigma);
+            volatilityPrice.textContent = `₹${price.toFixed(2)}`;
+            timePrice.textContent = `₹${price.toFixed(2)}`;
+            ratePrice.textContent = `₹${price.toFixed(2)}`;
+        }
 
         volatilitySlider.addEventListener('input', function () {
             volatilityValue.textContent = this.value;
+            updatePrices();
         });
 
         timeSlider.addEventListener('input', function () {
             timeValue.textContent = this.value;
+            updatePrices();
         });
+
+        rateSlider.addEventListener('input', function () {
+            rateValue.textContent = this.value;
+            updatePrices();
+        });
+
+        // Initial calculation
+        updatePrices();
 
         // Smooth scrolling for navigation
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
